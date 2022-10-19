@@ -1,43 +1,25 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import SearchBar from "../components/SearchBar";
-import yelp from "../api/yelp";
+import useResults from "../hooks/useResults";
+import ResultsList from "../components/ResultsList";
 
 const SearchScreen = () => {
 
     const [term, setTerm] = useState("");   // Term here refers to the text we are searching on the Search Bar
-    const [results, setResults] = useState([]);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [searchApi, results, errorMessage] = useResults();
 
-    const searchApi = async (searchTerm) => {
+    const filterResultsByPrice = price => {
 
-        try {
+        // price === "$" || "$$" || "$$$"
 
-            const response = await yelp.get("/search", {
+        return results.filter(result => {
 
-                params: {
+            return result.price === price;
 
-                    limit: 50,
-
-                    term: searchTerm,
-
-                    location: "san jose"
-                }
-            });
-
-            setResults(response.data.businesses);
-
-        } catch(err) {
-
-            setErrorMessage("Something went wrong!");
-        }
-
+        });
     };
-
-    // Call searchApi when the component is first rendered. BAD CODE!
-
-    // searchApi("pasta");
-
+    
     return (
 
         <View>
@@ -55,6 +37,10 @@ const SearchScreen = () => {
             {errorMessage ? <Text>{errorMessage}</Text> : null}
 
             <Text>We have found {results.length} results</Text>
+
+            <ResultsList results={filterResultsByPrice("$")} title="Cost Effective" />
+            <ResultsList results={filterResultsByPrice("$$")} title="Bit Pricier" />
+            <ResultsList results={filterResultsByPrice("$$$")} title="Big Spender" />
 
         </View>
 
@@ -98,3 +84,15 @@ export default SearchScreen;
 // - Get search results, call setter
 
 // - Updated state causes component to re-render 
+
+
+// useEffect's Second Argument
+
+// 1. useEffect(() => {}):          Run the arrow function "every time" the component 
+//                                  is rendered
+
+// 2. useEffect(() => {}, [ ]):     Run the arrow function "only" when the component 
+//                                  is "first" rendered
+
+// 3. useEffect(() => {}, [value]): Run the arrow function "only" when the component 
+//                                  is "first" rendered, "and" when the "'value' changes"
