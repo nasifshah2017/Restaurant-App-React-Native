@@ -5,6 +5,11 @@ import ResultsDetail from "./ResultsDetail";
 
 const ResultsList = props => {
 
+    if(!props.results.length) {
+
+        return null;
+    }
+
     return (
 
         <View style={styles.container}>
@@ -18,7 +23,7 @@ const ResultsList = props => {
                 keyExtractor={(result) => result.id}
                 renderItem={({ item }) => {
                     return (
-                        <TouchableOpacity onPress={() => props.navigation.navigate("ResultsShow")}>
+                        <TouchableOpacity onPress={() => props.navigation.navigate("ResultsShow", {id: item.id})}>
                             <ResultsDetail result={item} />
                         </TouchableOpacity>
                     )
